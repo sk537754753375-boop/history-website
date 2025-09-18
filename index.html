@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Duniya Ki History — Timeline</title>
+  <style>
+    /* ---------- PAGE 1: Welcome Screen ---------- */
+    body, html {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      height: 100%;
+      width: 100%;
+    }
+
+    #welcome-screen {
+      background: linear-gradient(135deg, #2c3e50, #3498db);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      height: 100vh;
+      transition: opacity 0.8s ease;
+    }
+
+    #welcome-screen h1 {
+      color: #fff;
+      margin-bottom: 30px;
+      font-size: 32px;
+    }
+
+    .open-btn {
+      padding: 15px 40px;
+      border: none;
+      border-radius: 50px;
+      background: linear-gradient(45deg, #ff416c, #ff4b2b);
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .open-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 12px 25px rgba(0, 0, 0, 0.4);
+      background: linear-gradient(45deg, #ff4b2b, #ff416c);
+    }
+
+    /* ---------- PAGE 2: Timeline Editor ---------- */
+    #timeline-screen {
+      display: none;
+      background: linear-gradient(120deg,#071026 0%, #0f1724 60%);
+      color: #e6eef6;
+      padding: 24px;
+      min-height: 100vh;
+    }
+
+    :root {
+      --bg: #0f1724; --card:#0b1220; --accent:#ff6b6b; --muted:#9aa4b2;
+      --glass: rgba(255,255,255,0.03);
+    }
+
+    header{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:18px}
+    header h1{margin:0;font-size:20px}
+    .controls{margin-left:auto;display:flex;gap:8px;align-items:center;}
+
+    input[type="search"], select, input[type="number"], input[type="text"] {
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: var(--card);
+      color: inherit;
+    }
+
+    button {
+      background: linear-gradient(90deg,var(--accent),#ff8a65);
+      border: none;
+      padding: 8px 12px;
+      border-radius: 10px;
+      color: #031021;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 16px;
+    }
+
+    .panel {
+      background: var(--card);
+      padding: 14px;
+      border-radius: 12px;
+      box-shadow: 0 6px 30px rgba(2,6,23,0.6);
+    }
+
+    .panel h2 { margin-top: 0; font-size: 16px; }
+
+    .event-list {
+      max-height: 70vh;
+      overflow: auto;
+      padding-right: 6px;
+    }
+
+    .item {
+      padding: 10px;
+      border-radius: 10px;
+      margin-bottom: 8px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+    }
+
+    .year {
+      min-width: 78px;
+      font-weight: 700;
+      color: var(--accent);
+      font-size: 14px;
+    }
+
+    .meta { font-size: 13px; color: var(--muted); }
+    .content { flex: 1; }
+    .actions { display: flex; gap: 8px; }
+
+    textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: var(--glass);
+      color: inherit;
+    }
+
+    label { font-size: 13px; color: var(--muted); display: block; margin-bottom: 6px; }
+
+    .footer { margin-top: 12px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .big { font-size: 14px; padding: 12px 16px; border-radius: 12px; }
+    .badge { background: rgba(255,255,255,0.03); padding: 6px 8px; border-radius: 8px; font-size: 12px; color: var(--muted); }
+
+    .search-row { display:flex; gap:8px; align-items:center; margin-bottom:10px; }
+    .timeline-view { padding: 16px; }
+    .timeline {
+      position: relative;
+      padding-left: 20px;
+      border-left: 2px solid rgba(255,255,255,0.04);
+    }
+
+    .t-item {
+      position: relative;
+      margin-bottom: 18px;
+      padding-left: 12px;
+    }
+
+    .t-item::before {
+      content: "";
+      position: absolute;
+      left: -11px;
+      top: 4px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 18px rgba(255,107,107,0.35);
+    }
+
+    .t-head { display: flex; gap: 12px; align-items: center; }
+    .t-title { font-weight: 700; }
+    .small { font-size: 13px; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <!-- WELCOME SCREEN -->
+  <div id="welcome-screen">
+    <h1>Welcome to Duniya Ki History</h1>
+    <button class="open-btn" onclick="openTimeline()">Open</button>
+  </div>
+
+  <!-- TIMELINE SCREEN -->
+  <div id="timeline-screen">
+    <header>
+      <div>
+        <h1>Duniya Ki History — Timeline Editor</h1>
+        <div style="color:var(--muted);font-size:13px">
+          Isme aap events add karo — phir export/import karke data safe rakho.
+        </div>
+      </div>
+      <div class="controls">
+        <input id="search" type="search" placeholder="Search events / keywords" />
+        <select id="eraFilter">
+          <option value="">— Filter by era —</option>
+          <option value="Prehistory">Prehistory</option>
+          <option value="Ancient">Ancient</option>
+          <option value="Classical">Classical</option>
+          <option value="Medieval">Medieval</option>
+          <option value="Early Modern">Early Modern</option>
+          <option value="Modern">Modern</option>
+          <option value="Contemporary">Contemporary</option>
+        </select>
+        <button id="exportBtn">Export JSON</button>
+        <label class="badge">
+          <input id="importFile" class="file-input" type="file" accept="application/json" style="display:none" />Import
+        </label>
+      </div>
+    </header>
+
+    <div class="layout">
+      <!-- Left Panel -->
+      <aside class="panel">
+        <h2>Events</h2>
+        <div class="search-row">
+          <input id="yearFilter" type="number" placeholder="Year (e.g. -3000)" />
+          <select id="eraSelect">
+            <option value="Prehistory">Prehistory</option>
+            <option value="Ancient">Ancient</option>
+            <option value="Classical">Classical</option>
+            <option value="Medieval">Medieval</option>
+            <option value="Early Modern">Early Modern</option>
+            <option value="Modern">Modern</option>
+            <option value="Contemporary">Contemporary</option>
+          </select>
+        </div>
+        <div style="margin-bottom:8px">
+          <label class="small">Title</label>
+          <input id="title" type="text" placeholder="Event title" />
+        </div>
+        <div style="margin-bottom:8px">
+          <label class="small">Description</label>
+          <textarea id="desc" placeholder="Detailed description..."></textarea>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button id="addBtn" class="big">Add / Update Event</button>
+          <button id="clearBtn" class="big" style="background:#26354a;color:#e6eef6">Clear</button>
+        </div>
+        <div class="footer">
+          <span class="badge" id="countBadge">0 events</span>
+          <button id="resetBtn" style="background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)">Reset All</button>
+        </div>
+        <div class="event-list" id="list"></div>
+      </aside>
+
+      <!-- Right Timeline View -->
+      <main class="panel timeline-view">
+        <h2>Timeline</h2>
+        <div id="timeline" class="timeline"></div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    // Switch between welcome screen and timeline
+    function openTimeline() {
+      document.getElementById('welcome-screen').style.display = 'none';
+      document.getElementById('timeline-screen').style.display = 'block';
+    }
+
+    /* Timeline Logic */
+    const STORAGE_KEY = 'worldHistoryEvents_v1';
+    function genId(){ return 'e_'+Math.random().toString(36).slice(2,9); }
+
+    const sampleData = [
+      {id:genId(),year:-200000,era:'Prehistory',title:'Early Homo sapiens appear',desc:'Modern humans emerge in Africa.'},
+      {id:genId(),year:-10000,era:'Prehistory',title:'Neolithic Revolution',desc:'Agriculture and settled life begin.'},
+      {id:genId(),year:-3500,era:'Ancient',title:'Invention of Writing',desc:'Sumerians create cuneiform script.'},
+      {id:genId(),year:1947,era:'Contemporary',title:'Indian Independence',desc:'End of British colonial rule in India.'},
+    ];
+
+    function loadData(){
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw){
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(sampleData));
+        return sampleData.slice();
+      }
+      return JSON.parse(raw);
+    }
+
+    let events = loadData();
+
+    const DOM = {
+      list: document.getElementById('list'),
+      timeline: document.getElementById('timeline'),
+      addBtn: document.getElementById('addBtn'),
+      clearBtn: document.getElementById('clearBtn'),
+      resetBtn: document.getElementById('resetBtn'),
+      title: document.getElementById('title'),
+      desc: document.getElementById('desc'),
+      yearFilter: document.getElementById('yearFilter'),
+      eraSelect: document.getElementById('eraSelect'),
+      search: document.getElementById('search'),
+      eraFilter: document.getElementById('eraFilter'),
+      countBadge: document.getElementById('countBadge'),
+      exportBtn: document.getElementById('exportBtn'),
+      importFile: document.getElementById('importFile')
+    };
+
+    let editingId = null;
+
+    function saveAll(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(events)); }
+
+    function renderList() {
+      DOM.list.innerHTML = '';
+      const filtered = events.slice().sort((a,b)=>a.year - b.year);
+      DOM.countBadge.textContent = filtered.length + ' events';
+      for(const ev of filtered){
+        const div = document.createElement('div');
+        div.className = 'item';
+        div.innerHTML = `
+          <div class="year">${ev.year}</div>
+          <div class="content">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <div>
+                <div style="font-weight:700">${ev.title}</div>
+                <div class="meta">${ev.era}</div>
+              </div>
+              <div class="actions">
+                <button onclick="editEvent('${ev.id}')">Edit</button>
+                <button style="background:#334155;color:#e6eef6" onclick="deleteEvent('${ev.id}')">Del</button>
+              </div>
+            </div>
+            <div style="margin-top:8px;color:var(--muted);font-size:14px">${ev.desc}</div>
+          </div>`;
+        DOM.list.appendChild(div);
+      }
+      renderTimeline(filtered);
+    }
+
+    function renderTimeline(list){
+      DOM.timeline.innerHTML = '';
+      for(const ev of list){
+        const el = document.createElement('div');
+        el.className = 't-item';
+        el.innerHTML = `<div class="t-head">
+          <div style="min-width:90px;font-weight:700;color:var(--accent)">${ev.year}</div>
+          <div><div class="t-title">${ev.title}</div><div class="small">${ev.era}</div></div>
+        </div>
+        <div style="margin-top:6px;color:var(--muted)">${ev.desc}</div>`;
+        DOM.timeline.appendChild(el);
+      }
+    }
+
+    function addOrUpdate(){
+      const title = DOM.title.value.trim();
+      const desc = DOM.desc.value.trim();
+      const year = Number(DOM.yearFilter.value.trim());
+      const era = DOM.eraSelect.value;
+      if(!title || isNaN(year)) return alert('Title and Year required');
+      if(editingId){
+        const ev = events.find(e=>e.id===editingId);
+        ev.title = title; ev.desc = desc; ev.year = year; ev.era = era;
+        editingId = null;
+      } else {
+        events.push({id:genId(),year,era,title,desc});
+      }
+      saveAll();
+      clearForm();
+      renderList();
+    }
+
+    function clearForm(){ DOM.title.value=''; DOM.desc.value=''; DOM.yearFilter.value=''; editingId=null; }
+
+    function editEvent(id){
+      const ev = events.find(e=>e.id===id);
+      if(!ev) return;
+      editingId = id;
+      DOM.title.value = ev.title;
+      DOM.desc.value = ev.desc;
+      DOM.yearFilter.value = ev.year;
+      DOM.eraSelect.value = ev.era;
+    }
+
+    function deleteEvent(id){
+      events = events.filter(e=>e.id!==id);
+      saveAll();
+      renderList();
+    }
+
+    function resetAll(){
+      if(confirm('Reset all events?')){
+        events = sampleData.slice();
+        saveAll();
+        renderList();
+      }
+    }
+
+    DOM.addBtn.onclick = addOrUpdate;
+    DOM.clearBtn.onclick = clearForm;
+    DOM.resetBtn.onclick = resetAll;
+    DOM.exportBtn.onclick = () => {
+      const dataStr = JSON.stringify(events, null, 2);
+      const blob = new Blob([dataStr], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'world_history.json';
+      a.click();
+    };
+    DOM.importFile.onchange = e => {
+      const file = e.target.files[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = evt => {
+        try {
+          const imported = JSON.parse(evt.target.result);
+          events = imported;
+          saveAll();
+          renderList();
+        } catch {
+          alert('Invalid file');
+        }
+      };
+      reader.readAsText(file);
+    };
+
+    renderList();
+  </script>
+</body>
+</html>
